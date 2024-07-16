@@ -18,7 +18,7 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.7.3'
+          flutter-version: '3.3.0'
 
       - name: Install dependencies
         run: flutter pub get
@@ -39,23 +39,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Create GCP service account key file
+      - name: Decode GCP service account key
         run: |
-          echo '{
-            "type": "${{ secrets.GCP_TYPE }}",
-            "project_id": "${{ secrets.GCP_PROJECT_ID }}",
-            "private_key_id": "${{ secrets.GCP_PRIVATE_KEY_ID }}",
-            "private_key": "${{ secrets.GCP_PRIVATE_KEY }}",
-            "client_email": "${{ secrets.GCP_CLIENT_EMAIL }}",
-            "client_id": "${{ secrets.GCP_CLIENT_ID }}",
-            "auth_uri": "${{ secrets.GCP_AUTH_URI }}",
-            "token_uri": "${{ secrets.GCP_TOKEN_URI }}",
-            "auth_provider_x509_cert_url": "${{ secrets.GCP_AUTH_PROVIDER_X509_CERT_URL }}",
-            "client_x509_cert_url": "${{ secrets.GCP_CLIENT_X509_CERT_URL }}",
-            "universe_domain": "${{ secrets.GCP_UNIVERSE_DOMAIN }}"
-          }' > $HOME/gcp-key.json
+          echo ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }} | base64 --decode > $GITHUB_WORKSPACE/gcp-key.json
+
+      - name: Verify JSON key file
+        run: cat $GITHUB_WORKSPACE/gcp-key.json
 
       - name: Upload APK to Google Drive
         run: python upload_to_drive.py
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp-key.json
+          GOOGLE_APPLICATION_CREDENTIALS: $GITHUB_WORKSPACE/gcp-key.json
