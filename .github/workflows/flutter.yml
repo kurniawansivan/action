@@ -41,11 +41,13 @@ jobs:
 
       - name: Decode GCP service account key
         run: |
-          echo ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }} | base64 --decode > $GITHUB_WORKSPACE/gcp-key.json
+          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 --decode > $GITHUB_WORKSPACE/gcp-key.json
 
       - name: Verify JSON key file
         run: |
+          echo "Contents of \$GITHUB_WORKSPACE:"
           ls -al $GITHUB_WORKSPACE
+          echo "Contents of gcp-key.json:"
           cat $GITHUB_WORKSPACE/gcp-key.json
 
       - name: Upload APK to Google Drive
