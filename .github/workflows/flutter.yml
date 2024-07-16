@@ -39,18 +39,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Create directory for GCP key
+        run: mkdir -p secrets
+
       - name: Decode GCP service account key
         run: |
-          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 --decode > $GITHUB_WORKSPACE/gcp-key.json
+          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 --decode > secrets/gcp-key.json
 
       - name: Verify JSON key file
         run: |
-          echo "Contents of \$GITHUB_WORKSPACE:"
-          ls -al $GITHUB_WORKSPACE
+          echo "Contents of secrets directory:"
+          ls -al secrets
           echo "Contents of gcp-key.json:"
-          cat $GITHUB_WORKSPACE/gcp-key.json
+          cat secrets/gcp-key.json
 
       - name: Upload APK to Google Drive
         run: python upload_to_drive.py
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: $GITHUB_WORKSPACE/gcp-key.json
+          GOOGLE_APPLICATION_CREDENTIALS: secrets/gcp-key.json
