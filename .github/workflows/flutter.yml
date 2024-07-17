@@ -44,7 +44,7 @@ jobs:
           pip install -r .github/scripts/requirements.txt
 
       - name: Export GCP credentials as an environment variable
-        run: echo "export GCP_CREDENTIALS_JSON=${{ secrets.GCP_CREDENTIALS_JSON }}" >> $GITHUB_ENV
+        run: echo "GCP_CREDENTIALS_JSON=${{ secrets.GCP_CREDENTIALS_JSON }}" >> $GITHUB_ENV
 
       - name: Upload APK to Google Drive
         run: python .github/scripts/upload_to_drive.py
