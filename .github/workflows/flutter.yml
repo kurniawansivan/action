@@ -47,12 +47,13 @@ jobs:
         run: mkdir -p .github/scripts
 
       - name: Decode GCP service account key
-        run: echo "$GCP_CREDENTIALS_JSON" | base64 --decode > .github/scripts/gcp-key.json
+        run: echo "${{ secrets.GCP_CREDENTIALS_JSON }}" | base64 --decode > .github/scripts/gcp-key.json
 
       - name: Verify JSON key file
         run: |
-          echo "Contents of gcp-key.json:"
+          echo "Checking gcp-key.json file contents:"
           cat .github/scripts/gcp-key.json
+          echo "End of gcp-key.json contents."
 
       - name: Upload APK to Google Drive
         run: python .github/scripts/upload_to_drive.py
