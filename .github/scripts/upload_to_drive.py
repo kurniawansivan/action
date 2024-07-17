@@ -19,10 +19,11 @@ def upload_to_drive(file_path, credentials_path, folder_id):
     file = service.files().create(body=file_metadata,
                                   media_body=media,
                                   fields='id').execute()
-    print(f'File ID: {file.get("id")}')
+    return file
 
 if __name__ == "__main__":
-    file_path = "build/app/outputs/flutter-apk/app-debug.apk"
+    file_path = os.getenv("APK_PATH")
     credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-    folder_id = "1J1lVgJqMbTzY1IIY9g40M2nACT4dKZrL"
-    upload_to_drive(file_path, credentials_path, folder_id)
+    folder_id = os.getenv("GCP_FOLDER_ID")
+    uploaded_file = upload_to_drive(file_path, credentials_path, folder_id)
+    print(f'File ID: {uploaded_file.get("id")}')

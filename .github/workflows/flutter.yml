@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+env:
+  GCP_FOLDER_ID: ${{ secrets.GCP_FOLDER_ID }}
+  APK_PATH: build/app/outputs/flutter-apk/app-debug.apk
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,28 +36,19 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: '3.10.4'
 
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Create directory for GCP key
-        run: mkdir -p secrets
+          pip install -r .github/scripts/requirements.txt
 
       - name: Decode GCP service account key
-        run: |
-          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 --decode > secrets/gcp-key.json
-
-      - name: Verify JSON key file
-        run: |
-          echo "Contents of secrets directory:"
-          ls -al secrets
-          echo "Contents of gcp-key.json:"
-          cat secrets/gcp-key.json
+        run: echo "$GCP_CREDENTIALS_JSON" | base64 --decode > .github/scripts/gcp-key.json
 
       - name: Upload APK to Google Drive
-        run: python upload_to_drive.py
+        run: python .github/scripts/upload_to_drive.py
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: secrets/gcp-key.json
+          GOOGLE_APPLICATION_CREDENTIALS: .github/scripts/gcp-key.json
+          GCP_FOLDER_ID: ${{ secrets.GCP_FOLDER_ID }}
+          APK_PATH: build/app/outputs/flutter-apk/app-debug.apk
