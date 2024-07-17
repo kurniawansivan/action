@@ -43,21 +43,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r .github/scripts/requirements.txt
 
-      - name: Create directory for GCP key
-        run: mkdir -p .github/scripts
-
-      - name: Decode GCP service account key
-        run: echo "${{ secrets.GCP_CREDENTIALS_JSON }}" | base64 --decode > .github/scripts/gcp-key.json
-
-      - name: Verify JSON key file
-        run: |
-          echo "Checking gcp-key.json file contents:"
-          cat .github/scripts/gcp-key.json
-          echo "End of gcp-key.json contents."
+      - name: Export GCP credentials as an environment variable
+        run: echo "export GCP_CREDENTIALS_JSON=${{ secrets.GCP_CREDENTIALS_JSON }}" >> $GITHUB_ENV
 
       - name: Upload APK to Google Drive
         run: python .github/scripts/upload_to_drive.py
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: .github/scripts/gcp-key.json
+          GCP_CREDENTIALS_JSON: ${{ secrets.GCP_CREDENTIALS_JSON }}
           GCP_FOLDER_ID: ${{ secrets.GCP_FOLDER_ID }}
           APK_PATH: build/app/outputs/flutter-apk/app-debug.apk
